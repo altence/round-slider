@@ -215,8 +215,6 @@ export class RoundSlider extends LitElement {
         this._dragpos(pos);
     }
     _dragpos(pos) {
-        if (pos < this._rotation.min || pos > this._rotation.max)
-            return;
         const handle = this._rotation.handle;
         this[handle.id] = pos;
         let event = new CustomEvent("value-changing", {
