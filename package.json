@@ -37,7 +37,8 @@
   "files": [
     "round-slider.js",
     "round-slider.cjs",
-    "round-slider.iife.js"
+    "round-slider.iife.js",
+    "round-slider.d.ts"
   ],
   "repository": {
     "url": "https://github.com/thomasloven/round-slider.git",
