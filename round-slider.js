@@ -154,11 +154,14 @@ export class RoundSlider extends LitElement {
             handle = handle.nextElementSibling;
         if (!handle.classList.contains("handle"))
             return;
+        const handleBorder = this.shadowRoot.querySelector(`#${handle.id}-border`);
         handle.setAttribute("stroke-width", String(2 * this.handleSize * this.handleZoom * this._scale));
+        handleBorder.setAttribute("stroke-width", String(2 * (this.handleSize + 1) * this.handleZoom * this._scale));
         const min = handle.id === "high" ? this.low : this.min;
         const max = handle.id === "low" ? this.high : this.max;
         this._rotation = {
             handle,
+            handleBorder,
             min,
             max,
             start: this[handle.id],
@@ -169,7 +172,9 @@ export class RoundSlider extends LitElement {
     }
     _cleanupRotation() {
         const handle = this._rotation.handle;
+        const handleBorder = this._rotation.handleBorder;
         handle.setAttribute("stroke-width", String(2 * this.handleSize * this._scale));
+        handleBorder.setAttribute("stroke-width", String(2 * (this.handleSize + 1) * this._scale));
         this._rotation = undefined;
         this.dragging = false;
         handle.blur();
@@ -330,6 +335,17 @@ export class RoundSlider extends LitElement {
           stroke="rgba(0,0,0,0)"
           stroke-width="${4 * this.handleSize * this._scale}"
           />
+          <path
+          id=${`${id}-border`}
+          class="handle-border"
+          d="
+          M ${pos.x} ${pos.y}
+          L ${pos.x + 0.001} ${pos.y + 0.001}
+          "
+          vector-effect="non-scaling-stroke"
+          stroke-width="${2 * (this.handleSize + 1) * this._scale}"
+          tabindex="0"
+          />
         <path
           id=${id}
           class="handle"
@@ -437,6 +453,9 @@ export class RoundSlider extends LitElement {
       }
       g.high.handle {
         stroke: var(--round-slider-high-handle-color);
+      }
+      .handle-border {
+        stroke: var(--round-slider-handle-border-color);
       }
       svg[disabled] g.handles {
         stroke: var(--round-slider-disabled-bar-color, darkgray);
