@@ -201,10 +201,9 @@ export class RoundSlider extends LitElement {
 
     if (!handle.classList.contains("handle")) return;
     handle.setAttribute(
-      "stroke-width",
-      String(2 * this.handleSize * this.handleZoom * this._scale)
+      "r",
+      String(2 * (this.handleSize / 150) * this.handleZoom * this._scale)
     );
-
     const min = handle.id === "high" ? this.low : this.min;
     const max = handle.id === "low" ? this.high : this.max;
     this._rotation = {
@@ -220,11 +219,7 @@ export class RoundSlider extends LitElement {
 
   private _cleanupRotation(): void {
     const handle = this._rotation.handle;
-    handle.setAttribute(
-      "stroke-width",
-      String(2 * this.handleSize * this._scale)
-    );
-
+    handle.setAttribute("r", String(2 * (this.handleSize / 150) * this._scale));
     this._rotation = undefined;
     this.dragging = false;
 
@@ -386,6 +381,7 @@ export class RoundSlider extends LitElement {
 
     // Two handles are drawn. One visible, and one invisible that's twice as
     // big. Makes it easier to click.
+
     return svg`
       <g class="${id} handle">
         <path
@@ -399,15 +395,14 @@ export class RoundSlider extends LitElement {
           stroke="rgba(0,0,0,0)"
           stroke-width="${4 * this.handleSize * this._scale}"
           />
-        <path
+        <circle
           id=${id}
           class="handle"
-          d="
-          M ${pos.x} ${pos.y}
-          L ${pos.x + 0.001} ${pos.y + 0.001}
-          "
+          cx="${pos.x}"
+          cy="${pos.y}"
+          r="${2 * (this.handleSize / 150) * this._scale}"
           vector-effect="non-scaling-stroke"
-          stroke-width="${2 * this.handleSize * this._scale}"
+          stroke-width="0.5"
           tabindex="0"
           @focus=${this.dragStart}
           @blur=${this.dragEnd}
@@ -417,8 +412,8 @@ export class RoundSlider extends LitElement {
           aria-valuenow=${this[id]}
           aria-disabled=${this.disabled}
           aria-label=${label || ""}
-          />
-        </g>
+        />
+      </g>
       `;
   }
 
@@ -489,6 +484,9 @@ export class RoundSlider extends LitElement {
       path {
         transition: stroke 1s ease-out, stroke-width 200ms ease-out;
       }
+      circle {
+        transition: r 200ms ease-out;
+      }
       .slider {
         fill: none;
         stroke-width: var(--round-slider-path-width, 3);
@@ -516,6 +514,10 @@ export class RoundSlider extends LitElement {
       }
       g.high.handle {
         stroke: var(--round-slider-high-handle-color);
+      }
+      circle.handle {
+        fill: var(--round-slider-handle-color);
+        stroke: var(--round-slider-handle-border-color);
       }
       svg[disabled] g.handles {
         stroke: var(--round-slider-disabled-bar-color, darkgray);
