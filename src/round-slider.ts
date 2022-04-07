@@ -10,6 +10,8 @@ import {
 } from "lit";
 import { property, state } from "lit/decorators.js";
 
+// We have to use everywhere in the code expression "this.max + 1" because of wrong distance between points. We will add 1 to the max value to make the distance between points equal. Last point will be skipped on drag.
+
 export class RoundSlider extends LitElement {
   @property({ type: Number }) public value: number;
   @property({ type: Number }) public high: number;
@@ -109,15 +111,15 @@ export class RoundSlider extends LitElement {
   }
 
   private _value2angle(value: number): number {
-    value = Math.min(this.max, Math.max(this.min, value));
-    const fraction = (value - this.min) / (this.max - this.min);
+    value = Math.min(this.max + 1, Math.max(this.min, value));
+    const fraction = (value - this.min) / (this.max + 1 - this.min);
     return this._start + fraction * this._len;
   }
 
   private _angle2value(angle: number): number {
     return (
       Math.round(
-        ((angle / this._len) * (this.max - this.min) + this.min) / this.step
+        ((angle / this._len) * (this.max + 1 - this.min) + this.min) / this.step
       ) * this.step
     );
   }
@@ -205,7 +207,7 @@ export class RoundSlider extends LitElement {
       String(2 * (this.handleSize / 150) * this.handleZoom * this._scale)
     );
     const min = handle.id === "high" ? this.low : this.min;
-    const max = handle.id === "low" ? this.high : this.max;
+    const max = handle.id === "low" ? this.high : this.max + 1;
     this._rotation = {
       handle,
       min,
@@ -246,7 +248,7 @@ export class RoundSlider extends LitElement {
     // close to the top end.  Otherwise if would be unclickable, and the high
     // handle locked by the low.  Calcualtion is done in the dragEnd handler to
     // avoid "z fighting" while dragging.
-    if (this.low && this.low >= 0.99 * this.max) this._reverseOrder = true;
+    if (this.low && this.low >= 0.99 * this.max + 1) this._reverseOrder = true;
     else this._reverseOrder = false;
   }
 
@@ -263,6 +265,8 @@ export class RoundSlider extends LitElement {
     ev.preventDefault();
 
     const pos = this._mouse2value(ev);
+
+    if (pos === this.max + 1) return; // Skip last extra point
 
     this._dragpos(pos);
   }
